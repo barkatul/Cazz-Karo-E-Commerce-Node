@@ -1,4 +1,4 @@
-const Review = require("../models/review.js");
+const Review = require("../models/review.model.js");
 const productService = require("../services/product.service.js");
 
 async function createReview(reqData, user){

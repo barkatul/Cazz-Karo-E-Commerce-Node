@@ -29,13 +29,14 @@ const createPaymentLink = async(orderId) => {
         const payment_link_url = paymentLink.short_url;
 
         const resData = {
-            paymentLinkId,
+            paymentLinkId: paymentLinkId,
             payment_link_url
         }
 
         return resData;
 
     } catch (error) {
+        console.log('Error creating payment link ', error)
         throw new Error(error.message)
     }
 }
@@ -50,7 +51,7 @@ const updatePaymentInformation = async (reqData) => {
 
         const payment = await razorpay.payments.fetch(paymentId)
 
-        if(payment.status == "captured"){
+        if(payment.status === "captured"){
             order.paymentDetails.paymentId = paymentId;
             order.paymentDetails.status = "COMPLETED";
             order.orderStatus = "PLACED";
@@ -62,6 +63,7 @@ const updatePaymentInformation = async (reqData) => {
 
         return resData;
     } catch (error) {
+        console.log("Error processing payment :", error)
         throw new Error(error.message)
     }
 }

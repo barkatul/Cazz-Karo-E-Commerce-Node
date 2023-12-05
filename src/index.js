@@ -2,6 +2,7 @@ const express=require("express")
 const cors=require("cors");
 
 const app=express()
+
 app.use(cors())
 app.use(express.json())
 
@@ -42,4 +43,4 @@ app.use("/api/ratings", ratingRouter);
 const paymentRouter=require("./routes/payment.routes.js");
 app.use("/api/payments", paymentRouter);
 
-module.exports=app;
+module.exports={app};

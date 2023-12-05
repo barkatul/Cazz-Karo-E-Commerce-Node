@@ -15,7 +15,7 @@ async function createOrder(user, shippAddress){
         address.user=user;
         await address.save();
 
-        user.address.push(address);
+        user.addresses.push(address);
         await user.save();
     }
 
@@ -30,13 +30,13 @@ async function createOrder(user, shippAddress){
             size: item.size,
             userId: item.userId,
             discountedPrice: item.discountedPrice,
-        })
+        });
 
         const createOrderItem = await orderItem.save();
         orderItems.push(createOrderItem)
     }
 
-    const createdOrder = new orderItems({
+    const createdOrder = new Order({
         user,
         orderItems,
         totalPrice: cart.totalPrice,
@@ -44,7 +44,11 @@ async function createOrder(user, shippAddress){
         discount : cart.discount,
         totalItem: cart.totalItem,
         shippAddress: address,
-    })
+        orderDate: new Date(),
+        orderStatus: "PENDING",
+        "paymentDetails.status": "PENDING",
+        createdAt: new Date(),
+    });
 
     const savedOrder = await createdOrder.save();
     return savedOrder;
@@ -119,7 +123,10 @@ async function getAllOrders(){
 
 async function deleteOrder(orderId){
     const order = await findOrderById(orderId);
-    await Order.findByIdAndDelete(order._id);
+
+    if(!order)throw new Error("order not found with id ",orderId)
+
+    await Order.findByIdAndDelete(orderId);
 }
 
 module.exports={

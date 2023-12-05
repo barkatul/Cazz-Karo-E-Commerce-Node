@@ -5,12 +5,12 @@ async function createProduct(reqData){
     let topLevel= await Category.findOne({name: reqData.topLevelCategory});
 
     if(!topLevel){
-        topLevel=new Category({
+        const topLevelCategory=new Category({
             name:reqData.topLevelCategory,
             level:1
         })
 
-        await topLevel.save()
+        topLevel = await topLevelCategory.save()
     }
 
     let secondLevel= await Category.findOne({
@@ -19,12 +19,12 @@ async function createProduct(reqData){
     })
 
     if(!secondLevel){
-        secondLevel = new Category({
+        const secondLevelCategory = new Category({
             name:reqData.secondLevelCategory,
             parentCategory:topLevel._id,
             level:2
         })
-        await secondLevel.save()
+        secondLevel = await secondLevelCategory.save()
     }
 
     let thirdLevel=await Category.findOne({
@@ -33,12 +33,12 @@ async function createProduct(reqData){
     })
 
     if(!thirdLevel){
-        thirdLevel= new Category({
+        const thirdLevelCategory= new Category({
             name:reqData.thirdLevelCategory,
             parentCategory:secondLevel._id,
             level:3,
         })
-        await thirdLevel.save()
+        thirdLevel = await thirdLevelCategory.save()
     }
 
     const product = new Product({
@@ -55,11 +55,16 @@ async function createProduct(reqData){
         category:thirdLevel._id,
     })
 
-    return await product.save();
+    const savedProduct = await product.save();
+    return savedProduct;
 }
 
 async function deleteProduct(productId){
     const product = await findProductById(productId);
+
+    if(!product){
+        throw new Error("product not found with - : ", productId);
+    }
 
     await Product.findByIdAndDelete(productId);
     return "Product deleted Successfully";
@@ -79,11 +84,10 @@ async function findProductById(id){
 }
 
 async function getAllProducts(reqQuery){
-    let {category,color,sizes,minProce,maxPrice,minDiscount,sort, stock, pageNumber, pageSize}
+    let {category,color,sizes,minPrice,maxPrice,minDiscount,sort, stock, pageNumber, pageSize}
     = reqQuery;
 
-    pageSize = pageSize || 10;
-
+    (pageSize = pageSize || 10), (pageNumber = pageNumber || 1);
     let query = Product.find().populate("category");
 
     if(category){
@@ -93,7 +97,7 @@ async function getAllProducts(reqQuery){
             query=query.where("category").equals(existCategory._id);
         }
         else{
-            return {content:[],currentPage:1,totalPages:0}
+            return {content:[],currentPage:1,totalPages:1}
         }
     }
     if(color){
@@ -118,11 +122,11 @@ async function getAllProducts(reqQuery){
     }
 
     if(stock){
-        if(stock == "in_stock"){
+        if(stock === "in_stock"){
             query = query.where("quantity").gt(0)
         }
-        else if(stock == "out_of_stock"){
-            query = query.where("quantity").gt(1);
+        else if(stock === "out_of_stock"){
+            query = (await query.where("quantity")).lte(0);
         }
     }
 
@@ -141,7 +145,7 @@ async function getAllProducts(reqQuery){
 
     const totalPages = Math.ceil(totalProducts/pageSize);
 
-    return {content:products, currentPage:pageNumber,totalPages,}
+    return {content:products, currentPage:pageNumber,totalPages:totalPages};
 }
 
 async function createMultipleProduct(products){

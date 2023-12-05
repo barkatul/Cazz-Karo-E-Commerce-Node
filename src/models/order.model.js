@@ -11,7 +11,7 @@ const orderSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "orderItems",
     },
-    orderData: {
+    orderDate: {
         type: Date,
         required: true,
         default: Date.now()

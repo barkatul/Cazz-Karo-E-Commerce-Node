@@ -3,25 +3,25 @@ const orderService = require("../services/orderService.js");
 const getAllOrders = async(req,res)=>{
     try {
         const orders = await orderService.getAllOrders();
-        return res.status(200).send(orders);
+        return res.status(200).json(orders);
     } catch (error) {
         return res.status(500).send({error:error.message});
     }
 }
 
 const confirmedOrders = async(req,res)=>{
-    const orderId = req.params.orderId;
     try {
+        const orderId = req.params.orderId;
         const orders = await orderService.confirmedOrder(orderId);
-        return res.status(200).send(orders);
+        return res.status(200).json(orders);
     } catch (error) {
         return res.status(500).send({error:error.message});
     }
 }
 
 const shippOrders = async(req,res)=>{
-    const orderId = req.params.orderId;
     try {
+        const orderId = req.params.orderId;
         const orders = await orderService.ShipOrder(orderId);
         return res.status(200).send(orders);
     } catch (error) {
@@ -30,8 +30,8 @@ const shippOrders = async(req,res)=>{
 }
 
 const deliverOrders = async(req,res)=>{
-    const orderId = req.params.orderId;
     try {
+        const orderId = req.params.orderId;
         const orders = await orderService.deliverOrder(orderId);
         return res.status(200).send(orders);
     } catch (error) {
@@ -40,8 +40,8 @@ const deliverOrders = async(req,res)=>{
 }
 
 const cancelledOrders = async(req,res)=>{
-    const orderId = req.params.orderId;
     try {
+        const orderId = req.params.orderId;
         const orders = await orderService.cancelledOrder(orderId);
         return res.status(200).send(orders);
     } catch (error) {
@@ -50,8 +50,8 @@ const cancelledOrders = async(req,res)=>{
 }
 
 const deleteOrders = async(req,res)=>{
-    const orderId = req.params.orderId;
     try {
+        const orderId = req.params.orderId;
         const orders = await orderService.deleteOrder(orderId);
         return res.status(200).send(orders);
     } catch (error) {

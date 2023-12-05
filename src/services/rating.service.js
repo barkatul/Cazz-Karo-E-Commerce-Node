@@ -5,7 +5,7 @@ async function createRating(req,user){
     const product = await productService.findProductById(req.productId);
 
     const rating = new Rating({
-        produc:product._id,
+        product:product._id,
         user:user._id,
         rating:req.rating,
         createdAt:new Date()
@@ -14,11 +14,11 @@ async function createRating(req,user){
     return await rating.save();
 }
 
-async function getProductRating(productId){
+async function getProductsRating(productId){
     return await Rating.find({product:productId});
 }
 
 module.exports={
     createRating,
-    getProductRating
+    getProductsRating
 }

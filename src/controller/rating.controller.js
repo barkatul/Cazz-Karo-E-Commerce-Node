@@ -1,8 +1,8 @@
 const ratingService = require("../services/rating.service.js");
 
 const createRating = async(req, res) => {
-    const user = await req.user;
     try {
+        const user = await req.user;
         const review = await ratingService.createRating(req.body,user);
         return res.status(201).send(review);
     } catch (error) {
@@ -21,7 +21,19 @@ const getAllRatings = async(req, res) => {
     }
 }
 
+const getProductsRating = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const ratings = await ratingService.getProductsRating(productId);
+        res.status(200).json(ratings);
+    } catch (error) {
+        res.status(500).json({ error: error.message})
+    }
+}
+
+
 module.exports={
     createRating,
-    getAllRatings
+    getAllRatings,
+    getProductsRating
 }

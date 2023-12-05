@@ -1,6 +1,6 @@
-const CartItem = require("../models/cartItem.model")
-const Product = require("../models/product.model")
-const Cart = require("../models/cart.model")
+const CartItem = require("../models/cartItem.model.js")
+const Product = require("../models/product.model.js")
+const Cart = require("../models/cart.model.js")
 
 
 async function createCart(user){
@@ -15,7 +15,7 @@ async function createCart(user){
 
 async function findUserCart(userId){
     try {
-        let cart = await Cart.findOne({user:user})
+        let cart = await Cart.findOne({user:userId})
 
         let cartItems = await CartItem.find({cart:cart._id}).populate("product");
 
@@ -25,7 +25,7 @@ async function findUserCart(userId){
         let totalDiscountedPrice=0;
         let totalItem=0;
 
-        for(let cartItem of cart.cartItems){
+        for(const cartItem of cart.cartItems){
             totalPrice+=cartItem.price;
             totalDiscountedPrice+=cartItem.discountedPrice;
             totalItem+=cartItem.quantity;
@@ -33,6 +33,7 @@ async function findUserCart(userId){
 
         cart.totalPrice=totalPrice;
         cart.totalItem=totalItem;
+        cart.totalDiscountedPrice=totalDiscountedPrice;
         cart.discount=totalPrice-totalDiscountedPrice;
 
         return cart;
@@ -58,15 +59,13 @@ async function addCartItem(userId, req){
                 price:product.price,
                 size:req.size,
                 discountedPrice:product.discountedPrice,
-            })
+            });
 
             const createdCartItem=await cartItem.save();
             cart.cartItems.push(createdCartItem);
             await cart.save();
-
-            return createdCartItem;
         }
-        return isPresent;
+        return 'Item added to cart';
     } catch (error) {
         throw new Error(error.message)
     }

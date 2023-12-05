@@ -26,10 +26,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    address:[{
+    addresses:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"addresses"
-    }],
+    },],
     paymentInformation:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"payment_information"

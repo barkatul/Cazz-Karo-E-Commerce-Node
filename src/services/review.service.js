@@ -4,6 +4,10 @@ const productService = require("../services/product.service.js");
 async function createReview(reqData, user){
     const product = await productService.findProductById(reqData.productId);
 
+    if(!product){
+        throw new Error("product not found with id : ", reqData.productId)
+    }
+
     const review = new Review({
         user:user._id,
         product:product._id,
@@ -18,7 +22,13 @@ async function createReview(reqData, user){
 async function getAllReview(productId){
     const product = await productService.findProductById(reqData.productId);
 
-    return await Review.find({product:productId}).populate("user");
+    if(!product){
+        throw new Error("product not found with id : ", productId)
+    }
+
+    const reviews = await Review.find({product:productId}).populate("user");
+    console.log("reviews ", reviews)
+    return reviews
 }
 
 module.exports={

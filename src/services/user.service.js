@@ -1,10 +1,10 @@
-const User = require("../models/user.model")
+const User = require("../models/user.model.js")
 const bcrypt = require("bcrypt");
 const jwtProvider = require("../config/jwtProvider.js");
 
 const createUser = async (userData) => {
     try {
-        let { firstName, lastName, email, password, mobile } = userData;
+        let { firstName, lastName, email, password, mobile, role } = userData;
 
         const isUserExist = await User.findOne({ email })
 
@@ -14,14 +14,14 @@ const createUser = async (userData) => {
 
         password = await bcrypt.hash(password, 8);
 
-        const user = await User.create({ firstName, lastName, email, password, mobile });
+        const user = await User.create({ firstName, lastName, email, password, mobile, role });
 
         console.log("created user ", user)
 
         return user;
 
     } catch (error) {
-
+        console.log("error - ", error.message)
         throw new Error(error.message)
     }
 }
@@ -36,6 +36,7 @@ const findUserById = async (userId) => {
         return user;
     }
     catch (error) {
+        console.log("error :---", error.message)
         throw new Error(error.message)
     }
 }
@@ -49,6 +50,7 @@ const getUserByEmail = async (email) => {
         return user;
     }
     catch (error) {
+        console.log("error :----", error.message)
         throw new Error(error.message)
     }
 }
@@ -57,7 +59,9 @@ const getUserProfileByToken = async (token) => {
     try {
         const userId = jwtProvider.getUserIdFromToken(token);
 
-        const user = await findUserById(userId)
+        console.log("user id ", userId)
+
+        const user = (await findUserById(userId)).populate("addresses");
 
         if (!user) {
             throw new Error("user not found with id : ", userId)
@@ -66,6 +70,7 @@ const getUserProfileByToken = async (token) => {
         return user;
 
     } catch (error) {
+        console.log("error :----", error.message)
         throw new Error(error.message)
     }
 }
@@ -76,6 +81,7 @@ const getAllUsers = async () => {
         return users;
 
     } catch (error) {
+        console.log("error :----", error.message)
         throw new Error(error.message)
     }
 }

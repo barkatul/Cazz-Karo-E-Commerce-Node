@@ -1,5 +1,15 @@
-const CartItem = require("../models/cartItem.model");
-const userService = require("../services/user.service");
+const CartItem = require("../models/cartItem.model.js");
+const userService = require("../services/user.service.js");
+
+async function createCartItem(cartItemData) {
+        const cartItem = new CartItem(cartItemData);
+        cartItem.quantity = 1;
+        cartItem.price = cartItem.product.price * cartItem.quantity;
+        cartItem.discountedPrice = cartItem.product.discountedPrice * cartItem.quantity;
+
+        const createdCartItem = await cartItem.save();
+        return createdCartItem;
+}
 
 async function updateCartItem(userId, cartItemId, cartItemData) {
     try {
@@ -18,10 +28,10 @@ async function updateCartItem(userId, cartItemId, cartItemData) {
         if (user._id.toString() === userId.toString()) {
             item.quantity = cartItemData.quantity;
             item.price = item.quantity * item.product.price;
-            item.discountedPrice = irem.quantity * item.product.discountedPrice;
+            item.discountedPrice = item.quantity * item.product.discountedPrice;
 
             const updatedCartItem = await item.save();
-            return updateCartItem;
+            return updatedCartItem;
         }
         else {
             throw new Error("you can't update this cart item")
@@ -31,12 +41,17 @@ async function updateCartItem(userId, cartItemId, cartItemData) {
     }
 }
 
+async function isCartItemExist(cart, product, size, userId) {
+    const cartItem = await cartItem.findOne({ cart, product, size, userId});
+    return cartItem;
+}
 async function removeCartItem(userId, cartItemId) {
     const cartItem = await findCartItemById(cartItemId);
-    const user = await userService.findUserById(userId);
+    const user = await userService.findUserById(cartItem.userId);
+    const reqUser = await userService.findUserById(userId);
 
-    if (user._id.toString() === cartItem.userId.toString()) {
-        return await cartItem.findByIdAndDelete(cartItemId)
+    if (user._id.toString() === reqUser.id.toString()) {
+        return await cartItem.findByIdAndDelete(cartItem.id)
     }
     throw new Error("You can't remove another user's item")
 }
@@ -55,4 +70,6 @@ module.exports = {
     updateCartItem,
     removeCartItem,
     findCartItemById,
+    createCartItem,
+    isCartItemExist,
 }
